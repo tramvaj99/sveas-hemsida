@@ -26,10 +26,10 @@ const arrows = {
 }
 
 const sounds = {
-    left: 'assets/left.wav',
-    right: 'assets/right.wav',
-    up: 'assets/up.wav',
-    down: 'assets/down.wav'
+    left: 'assets/left.m4a',
+    right: 'assets/right.m4a',
+    up: 'assets/up.m4a',
+    down: 'assets/down.m4a'
 }
 
 

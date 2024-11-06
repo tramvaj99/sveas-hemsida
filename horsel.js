@@ -1,62 +1,43 @@
-const testText = document.querySelector('#info');
+const message = document.getElementById('info');
+const reactionTimeDisplay = document.getElementById('reactionTime');
 const beepSound = document.getElementById('beep-sound');
 
-let waitingForReaction = false;
-let currentlyTesting = false;
 let startTime;
+let timeout;
 
-let counter = 0;
-let reaction_times = [];
+let reactionTimes = [];
 
-function displayMessage(message) {
-    console.log(testText)
-    testText.textContent = message;
-}
-
-function startReactionTest() {
-    displayMessage("Wait for the sound...");
-    currentlyTesting = true;
-    
-    // Set a random timeout between 2 to 5 seconds
-    const delay = Math.random() * (5000 - 2000) + 2000;
-
-    setTimeout(() => {
-        beepSound.play();  // Play the sound
-        startTime = Date.now();  // Record the start time
-        waitingForReaction = true;
-    }, delay);
-}
-
-// Event listener for keypress
-document.addEventListener('keydown', (event) => {
-    if (event.code === 'Space' ) {
-        if(counter >= 5){
-            reaction_times_string = "";
-            for (let i = 0; i < reaction_times.length; i++) {
-                reaction_times_string += `\n\n` + reaction_times[i] + " ms, ";
-            }
-            displayMessage("Testet är avklarat. Ditt resultat är " + reaction_times_string );
-
-            currentlyTesting = false;
-        }else {
-            if (!waitingForReaction) {
-                startReactionTest();  // Stasrt the test if not waiting
-            } else if(waitingForReaction){
-                const reactionTime = Date.now() - startTime;  // Calculate reaction time
-                reaction_times.push(reactionTime);  // Add the reaction time to the array
-                displayMessage(`Reaktionstid: ${reactionTime} ms`);
-                counter++;
-
-                setTimeout(() => 
-                    {
-                        displayMessage(`Test ${counter}/5 avklart. Klicka på Space för att börja nästa test.`);
-                        waitingForReaction = false;  // Reset the test state
-                    }, 
-                2000);
-    
-    
-            }
+function audtioryReactionTimeTest() {
+    if (startTime) {
+        const reactionTime = Date.now() - startTime; // Calculate reaction time
+        reactionTimeDisplay.textContent = `Din reaktionstid är ${reactionTime} ms`;
+        message.textContent = "";
+        startTime = null; // Reset start time for the next test
+        clearTimeout(timeout); // Clear timeout to avoid overlapping sounds
+        reactionTimes.push(reactionTime); // Save reaction time
+        if(reactionTimes.length === 5){
+            const sum = reactionTimes.reduce((a, b) => a + b, 0);
+            const average = sum / reactionTimes.length;
+            message.textContent = `Ditt resultat är ${reactionTimes.join(" ms, ")} ms. Medelvärdet är ${average.toFixed(2)} ms`;
+            document.removeEventListener('keydown', audtioryReactionTimeTest);
         }
-       
-    }
-});         
+    }else {
+        reactionTimeDisplay.textContent = "";
+        message.textContent = "Vänta på ljudet...";
+
+        // Set a random delay between 2 to 5 seconds
+        const delay = Math.floor(Math.random() * 3000) + 2000;
+
+        // Clear any existing timeout
+        clearTimeout(timeout);
+
+        // Set timeout for beep sound
+        timeout = setTimeout(() => {
+            beepSound.play(); // Play beep sound
+            startTime = Date.now(); // Record the start time
+        }, delay);
+
+        }
+}
+
+document.addEventListener('keydown', audtioryReactionTimeTest);
