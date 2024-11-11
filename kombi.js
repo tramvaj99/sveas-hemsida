@@ -63,7 +63,7 @@ function startReactionTest() {
         setTimeout(() => {
             displayMessage(`${arrows[random_direction_sign]}`);
             testText.classList.add('text-7xl')
-        }, 300);
+        }, 350);
         startTime = Date.now();  // Record the start time
         waitingForReaction = true;
     }, delay);
