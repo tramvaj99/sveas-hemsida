@@ -26,10 +26,10 @@ const arrows = {
 }
 
 const sounds = {
-    left: 'assets/left.m4a',
-    right: 'assets/right.m4a',
-    up: 'assets/up.m4a',
-    down: 'assets/down.m4a'
+    left: 'assets/left.wav',
+    right: 'assets/right.wav',
+    up: 'assets/up.wav',
+    down: 'assets/down.wav'
 }
 
 
@@ -40,26 +40,6 @@ function displayMessage(message) {
 }
 
 // Function to populate the table
-function populateTable(data) {
-    const tableBody = document.querySelector("#result-table tbody");
-
-    // Loop through each data item
-    data.forEach(item => {
-        // Create a new row
-        const row = document.createElement("tr");
-
-        // Create cells and append to the row
-        Object.values(item).forEach(value => {
-            const cell = document.createElement("td");
-            cell.textContent = value;
-            row.appendChild(cell);
-        });
-
-        // Append the row to the table body
-        tableBody.appendChild(row);
-    });
-}
-
 
 function startReactionTest() {
     displayMessage("Vänta...");
@@ -78,9 +58,12 @@ function startReactionTest() {
         direction_text.push(random_direction_sign)
         
         const audio = new Audio(sounds[random_direction_sound]);
+        audio.playbackRate=1.5;
         audio.play()
-        displayMessage(`${arrows[random_direction_sign]}`);
-        testText.classList.add('text-7xl')
+        setTimeout(() => {
+            displayMessage(`${arrows[random_direction_sign]}`);
+            testText.classList.add('text-7xl')
+        }, 300);
         startTime = Date.now();  // Record the start time
         waitingForReaction = true;
     }, delay);
@@ -89,48 +72,18 @@ function startReactionTest() {
 // Event listener for keypress
 document.addEventListener('keydown', (event) => {
     if (event.code === 'Space' ) {
-        if(counter >= 1){
-            displayMessage(`Testet är avklarat. Ditt resultat är:
-            Ljudet: ${arrows[direction_sound[0]]}/Text:${arrows[direction_text[0]]} - ${reactions[0]} ,
-            Ljudet: ${arrows[direction_sound[1]]}/Text:${arrows[direction_text[1]]} - ${reactions[0]} ,
-            Ljudet: ${arrows[direction_sound[2]]}/Text:${arrows[direction_text[2]]} - ${reactions[0]} ,
-            Ljudet: ${arrows[direction_sound[3]]}/Text:${arrows[direction_text[3]]} - ${reactions[0]} ,
-            Ljudet: ${arrows[direction_sound[4]]}/Text:${arrows[direction_text[4]]} - ${reactions[0]} ,
-
-                ` );
-            
-                data = [
-                    { 'Ljud': arrows[direction_sound[0]], 'Text': arrows[direction_text[0]], 'Reaktion': reactions[0] },
-                    { 'Ljud': arrows[direction_sound[1]], 'Text': arrows[direction_text[1]], 'Reaktion': reactions[1] },
-                    { 'Ljud': arrows[direction_sound[2]], 'Text': arrows[direction_text[2]], 'Reaktion': reactions[2] },
-                    { 'Ljud': arrows[direction_sound[3]], 'Text': arrows[direction_text[3]], 'Reaktion': reactions[3] },
-                    { 'Ljud': arrows[direction_sound[4]], 'Text': arrows[direction_text[4]], 'Reaktion': reactions[4] }
-                ];
-                populateTable(data);
-            currentlyTesting = false;
-        }else {
-            if (!waitingForReaction) {
-                startReactionTest();  // Stasrt the test if not waiting
-            } 
-            }
+     if(!waitingForReaction) {
+        startReactionTest();
+     }
        
     } else if (event.code === 'ArrowLeft' || event.code === 'ArrowRight' || event.code === 'ArrowUp' || event.code === 'ArrowDown') {
         if (waitingForReaction) {
             testText.classList.remove('text-7xl')
             const reaction = event.code.replace('Arrow', '').toLowerCase();
             reactions.push(arrows[reaction]);
-            displayMessage(`Reaktion: ${arrows[reaction]}`);
+            displayMessage(`Reaktion: ${arrows[reaction]}. Visade texten "${arrows[direction_text[counter]]}" och spelade ljudet "${arrows[direction_sound[counter]]}"`);
             counter++;
-            setTimeout(() => 
-                {
-                    if(counter === 1){
-                        displayMessage(`Test ${counter}/5 avklart. Klicka på Space för att se resultat.`);
-                    }else {
-                        displayMessage(`Test ${counter}/5 avklart. Klicka på Space för att börja nästa test.`);
-                        waitingForReaction = false;  // Reset the test state
-                    } 
-                }, 
-            2000);
+            waitingForReaction = false;
         }
     }
 });         
